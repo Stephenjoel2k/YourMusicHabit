@@ -4,7 +4,7 @@
   "description": "Keeps track of your music history from the moment you register and provide you with interesting insights.",
   "main": "index.js",
   "scripts": {
-      "start": "nodemon -e * index.js"
+      "start": "node index.js"
   },
   "repository": {
     "type": "git",
