@@ -14,8 +14,7 @@ router.get('/', async (req, res) => {
   const name = await user.display_name
   req.session.name = name;
   req.session.user_id = user_id;
-  res.render(path.resolve("./Views/User", {"user_data": {name, user_id}}));
- // return res.redirect('/user/' + req.session.user_id + '/recently-played')
+  res.render(path.resolve("./Views/User"), {"user_data": {name, user_id}});
 })
 
 router.get('/top-artists', async (req, res) => {
