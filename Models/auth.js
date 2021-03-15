@@ -29,7 +29,7 @@ const getCode = (res, redirect_uri) => {
     }
     request.post(authOptions, async function(error, response, body) {
       var access_token = await body.access_token
-      let uri = 'http://localhost:3000'
+      let uri = process.env.MAIN_URI        //localhost or heroku
       res.redirect(uri + '?access_token=' + access_token)
     })
   }
