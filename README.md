@@ -11,9 +11,10 @@ Keeps track of your music history from the moment you register and provide you w
 3. User can view their top artists/tracks
 
 ## Upcoming 
-1. ( Upcoming ) Add refresh tokens to automatically call the user's recently played every hour to update it.
-2. Add Data Visualization/Charts on Demand.
-3. Add the feature to create groups.
+1. A drop down menu to choose the top artists/tracks/recent dynamically. (long_term/short_term)
+2. ( Upcoming ) Add refresh tokens to automatically call the user's recently played every hour to update it.
+3. Add Data Visualization/Charts on Demand.
+4. Add the feature to create groups.
 
 ## Sprints
 
