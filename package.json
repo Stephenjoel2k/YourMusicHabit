@@ -26,10 +26,10 @@
     "moment": "^2.29.1",
     "mongodb": "^3.6.3",
     "querystring": "^0.2.1",
+    "dotenv": "^8.2.0",
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0",
     "nodemon": "^2.0.7"
   },
   "engines": {
