@@ -42,12 +42,11 @@ router.get('/top-tracks', async (req, res) => {
  * Logic: 1. We push all songs and prevent duplicate by keeping the played_at key unique 
  */
 router.get('/recently-played', async (req, res) => {
-    const recent = await getRecentlyPlayed(req);
+    const access_token = await req.session.secret
+    const user_id = await req.session.user_id
+    const recent = await getRecentlyPlayed(access_token, user_id);
     res.send(recent);
 })
 
-
-const delay = (duration) =>
-  new Promise(resolve => setTimeout(resolve, duration))
 
 module.exports = router

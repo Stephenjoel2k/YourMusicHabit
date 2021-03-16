@@ -10,12 +10,19 @@ Keeps track of your music history from the moment you register and provide you w
 2. Fetches and updates the user's recently played catalogue when user logins in.
 3. User can view their top artists/tracks
 4. A drop down menu to choose the top artists/tracks/recent dynamically. (long_term/short_term)
+5. A cron job that updates the db every 2 hours -> (yet to be developed on production env)
 
 ## Upcoming 
+
 1. ( Upcoming ) Add refresh tokens to automatically call the user's recently played every hour to update it.
 2. Add Data Visualization/Charts on Demand.
 3. Add the feature to create groups.
 4. A specific song over time graph. So that a user can see the number of times the user listened to the song/genre overtime.
+
+## Feature Ideas
+
+1. How mainstream are you? Analyses user's past 50 songs and favorite artists/tracks to provide them information on their genre/mainstreamness.
+
 
 ## Sprints
 

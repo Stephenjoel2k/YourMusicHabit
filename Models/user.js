@@ -1,9 +1,15 @@
 const mongodb = require('mongodb')
 const MongoClient = mongodb.MongoClient;
 const moment = require('moment');
+
+
 const { spotify } = require('../Models/spotifyApi.js')
 
-//Load all the tracks that are stored for the specific user
+/**
+ * 
+ * @param {string} user_id 
+ * @returns all the tracks linked to the current user 
+ */
 var get_all_tracks = async(user_id) => {
     const url = process.env.MONGO_URI;
     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -24,7 +30,10 @@ var get_all_tracks = async(user_id) => {
     }
 }
 
-//Get all the user_ids of the app
+/**
+ * 
+ * @returns All the User_ids registered/linked to the appplication database
+ */
 var get_all_users = async() => {
     const url = process.env.MONGO_URI;
     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -39,14 +48,18 @@ var get_all_users = async() => {
         })
         return user_ids;
     } catch (err) {
+        //handle error
         console.log(err.stack);
     } finally {
         await client.close();
     }
 }
 
-
-//Load the recently played songs from the Mongodb
+/**
+ * @param {string} user_id 
+ * @param {time} earliestSongInList 
+ * @returns  All the recently (between the earliest song in the recent 50 and current time) played songs from the Mongodb
+ */
 var get_recently_played = async(user_id, earliestSongInList) => {
     const url = process.env.MONGO_URI;
     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -61,13 +74,19 @@ var get_recently_played = async(user_id, earliestSongInList) => {
         await col.find({ "played_at" : { $gt : new Date(earliestSongInList)} }).forEach(time => {times.push(time.played_at)});
         return times;
     } catch (err) {
+        //handle error
         console.log(err.stack);
     } finally {
         await client.close();
     }
 }
 
-//Insert recently played songs from the SPOTIFY API
+/**
+ * Insert all the recently played songs received from the function "getRecentlyPlayed()" to the mongo
+ * @param {string} user_id 
+ * @param {json} tracks 
+ * @returns null
+ */
 var store_recently_played = async(user_id, tracks) => {
     if(tracks.length < 1){
         return;
@@ -102,6 +121,11 @@ var store_recently_played = async(user_id, tracks) => {
     }
 }
 
+/**
+ * 
+ * @param {*} req 
+ * @returns 
+ */
 var getTopArtists = async(req) => {
     const access_token = await req.session.secret
     const term = await req.query.term
@@ -114,6 +138,11 @@ var getTopArtists = async(req) => {
     return artists;
 }
 
+/**
+ * 
+ * @param {*} req 
+ * @returns 
+ */
 var getTopTracks = async(req) => {
     const access_token = await req.session.secret
     const term = await req.query.term
@@ -126,10 +155,13 @@ var getTopTracks = async(req) => {
     return tracks;
 }
 
-var getRecentlyPlayed = async(req) => {
-    const access_token = await req.session.secret
-    const user_id = await req.session.user_id
-
+/**
+ * 
+ * @param {*} access_token 
+ * @param {*} user_id 
+ * @returns 
+ */
+var getRecentlyPlayed = async(access_token, user_id) => {
     //get recently played songs
     const history = await spotify.recentlyPlayed(access_token)
 
@@ -149,6 +181,11 @@ var getRecentlyPlayed = async(req) => {
     return tracks;
 }
 
+/**
+ * 
+ * @param {*} body 
+ * @returns 
+ */
 //stores the refresh_token of the current user
 var store_refresh_token = async(body) => {
     const access_token = await body.access_token;
@@ -171,12 +208,18 @@ var store_refresh_token = async(body) => {
         await col.updateOne(query, update, options);
         return;
     } catch(err) {
+        //handle error
         console.log(err.stack);
     } finally {
         await client.close();
     }
   }
 
+/**
+ * 
+ * @param {*} user_id 
+ * @returns 
+ */
 //fetches the refresh_token of a specific user
 var get_refresh_token = async(user_id) => {
     const url = process.env.MONGO_URI;
@@ -189,7 +232,6 @@ var get_refresh_token = async(user_id) => {
         const db = client.db(dbName);
         const col = db.collection(collectionName);
         const refreshData = await col.findOne({"user_id": user_id});
-        console.log(refreshData);
         return refreshData.refresh_token;
     } catch(err) {
         console.log(err.stack);
