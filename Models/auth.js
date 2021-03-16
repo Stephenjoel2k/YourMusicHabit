@@ -2,6 +2,7 @@ const querystring = require('querystring');
 let request = require('request')
 require('dotenv').config()
 
+//For the refresh tokens
 const {spotify} = require('./spotifyApi')
 
 //set refresh token
@@ -57,7 +58,7 @@ const {store_refresh_token, store_recently_played, getRecentlyPlayed} = require(
   /**
    * if unable to generate access token then we need to delete the user
    * Here we not only generate an access token but also make sure the user's recent is added to DB
-   * @param {*} refresh_token 
+   * @param {string} refresh_token 
    */
   var generate_access_token_and_store_recent = async(refresh_token) => {
     const refreshBody = querystring.stringify({

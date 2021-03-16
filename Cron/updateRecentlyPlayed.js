@@ -4,7 +4,7 @@ const {get_all_users, get_refresh_token} = require('../Models/user');
 
 
 // Schedule tasks to be run on the server.
-cron.schedule('0 */2 * * *', async() => {
+cron.schedule('*/10 * * * * *', async() => {
     const user_ids = await get_all_users();
     console.log(user_ids);
     for(let i = 0; i<user_ids.length; i++){
