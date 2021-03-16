@@ -3,7 +3,8 @@ const MongoClient = mongodb.MongoClient;
 const moment = require('moment');
 const { spotify } = require('../Models/spotifyApi.js')
 
-var load_all_tracks = async(user_id) => {
+//Load all the tracks that are stored for the specific user
+var get_all_tracks = async(user_id) => {
     const url = process.env.MONGO_URI;
     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
     const dbName = user_id;
@@ -23,7 +24,30 @@ var load_all_tracks = async(user_id) => {
     }
 }
 
-var load_recently_played = async(user_id, earliestSongInList) => {
+//Get all the user_ids of the app
+var get_all_users = async() => {
+    const url = process.env.MONGO_URI;
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    const dbName = "RefreshTokens";
+    
+    try{
+        await client.connect();
+        const db = client.db(dbName);
+        const user_ids = [];
+        (await db.listCollections().toArray()).forEach(collection => {
+            user_ids.push(collection.name);
+        })
+        return user_ids;
+    } catch (err) {
+        console.log(err.stack);
+    } finally {
+        await client.close();
+    }
+}
+
+
+//Load the recently played songs from the Mongodb
+var get_recently_played = async(user_id, earliestSongInList) => {
     const url = process.env.MONGO_URI;
     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
     const dbName = user_id;
@@ -43,7 +67,8 @@ var load_recently_played = async(user_id, earliestSongInList) => {
     }
 }
 
-var insert_recently_played = async(user_id, tracks) => {
+//Insert recently played songs from the SPOTIFY API
+var store_recently_played = async(user_id, tracks) => {
     if(tracks.length < 1){
         return;
     } 
@@ -119,10 +144,71 @@ var getRecentlyPlayed = async(req) => {
 
     //insert to database while fetching if new songs are found
     if(user_id != 'abc'){
-      await insert_recently_played(user_id, tracks);
+      await store_recently_played(user_id, tracks);
     }
     return tracks;
 }
 
-module.exports = { load_recently_played, insert_recently_played, load_all_tracks, getTopArtists, getTopTracks, getRecentlyPlayed }
+//stores the refresh_token of the current user
+var store_refresh_token = async(body) => {
+    const access_token = await body.access_token;
+    const refresh_token = await body.refresh_token;
+    const user = await spotify.getUserProfile(access_token);
+    const user_id = user.id;
+
+    const url = process.env.MONGO_URI;
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    const dbName = "RefreshTokens";
+    const collectionName = user_id;
+    
+    try{
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection(collectionName);
+        const query = { "user_id": user_id };
+        const update = { $set: { "user_id": user_id, "refresh_token": refresh_token }};
+        const options = { upsert: true };
+        await col.updateOne(query, update, options);
+        return;
+    } catch(err) {
+        console.log(err.stack);
+    } finally {
+        await client.close();
+    }
+  }
+
+//fetches the refresh_token of a specific user
+var get_refresh_token = async(user_id) => {
+    const url = process.env.MONGO_URI;
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    const dbName = "RefreshTokens";
+    const collectionName = user_id;
+    
+    try{
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection(collectionName);
+        const refreshData = await col.findOne({"user_id": user_id});
+        console.log(refreshData);
+        return refreshData.refresh_token;
+    } catch(err) {
+        console.log(err.stack);
+    } finally {
+        await client.close();
+    }
+}
+
+
+
+module.exports = {   
+                    get_recently_played,
+                    store_recently_played,
+                    get_all_tracks, 
+                    get_all_users,
+                    getTopArtists, 
+                    getTopTracks, 
+                    getRecentlyPlayed, 
+                    store_refresh_token,
+                    get_refresh_token
+                }
 

@@ -22,3 +22,4 @@ Keeps track of your music history from the moment you register and provide you w
 1. 5:33:00hrs - Setup backend
 2. 4:30:00hrs - Creating visual charts on Mongo/building the UI
 3. 1:00:00hr - Deployed to Heroku
+4. 2:00:00hr - Fixed Favicon and dropdown menu
