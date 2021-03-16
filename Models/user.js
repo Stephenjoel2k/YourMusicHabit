@@ -79,7 +79,8 @@ var insert_recently_played = async(user_id, tracks) => {
 
 var getTopArtists = async(req) => {
     const access_token = await req.session.secret
-    const topArtists = await spotify.getUserTop("artists", "long_term", 50, 0, access_token)
+    const term = await req.query.term
+    const topArtists = await spotify.getUserTop("artists", term, 50, 0, access_token)
     const artists = [];
     let i = 1;
     topArtists.items.forEach(artist => {
@@ -90,7 +91,8 @@ var getTopArtists = async(req) => {
 
 var getTopTracks = async(req) => {
     const access_token = await req.session.secret
-    const topTracks = await spotify.getUserTop("tracks", "long_term", 50, 0, access_token)
+    const term = await req.query.term
+    const topTracks = await spotify.getUserTop("tracks", term, 50, 0, access_token)
     const tracks = []
     let i = 1;
     topTracks.items.forEach(track => {

@@ -5,16 +5,36 @@
     <body>
         
         <h1>Welcome, <%= user_data.name %>!</h1>
+        
         <h2>Here are your options: </h2>
-        <p>View Your Top 50 artists</p>
-        <form method="get" action="/user/top-artists"> 
-            <button>Top Artists</button> 
-        </form>
 
-        <p>View Your Top 50 tracks</p>
-        <form method="get" action="/user/top-tracks"> 
-            <button>Top Tracks</button> 
-        </form>
+        <div class="artists">
+            <p>View Your Top 50 artists</p>
+            <form method="get" action="/user/top-artists"> 
+                <input type="submit" value="Get Top Artists">
+                <label for="term">Choose a term:</label>
+                <select name="term" id="term">
+                    <option value="long_term">Long Term (years)</option>
+                    <option value="medium_term">Medium Term (6 months)</option>
+                    <option value="short_term">Short Term (4 weeks)</option>
+                </select>
+            </form>
+        </div>
+
+        
+        <div class="tracks">
+            <p>View Your Top 50 Tracks</p>
+            <form method="get" action="/user/top-tracks"> 
+                <input type="submit" value="Get Top Tracks">
+                <label for="term">Choose a term:</label>
+                <select name="term" id="term">
+                    <option value="long_term">Long Term (years)</option>
+                    <option value="medium_term">Medium Term (6 months)</option>
+                    <option value="short_term">Short Term (4 weeks)</option>
+                </select>
+            </form>
+        </div>
+        
 
         <p>View Your Recently-Played tracks</p>
         <form method="get" action="/user/Recently-Played"> 
