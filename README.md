@@ -23,7 +23,7 @@ Keeps track of your music history from the moment you register and provide you w
 ## Upcoming 
 
 1. Make the top artists/tracks more visually appealing
-2. Create a prettier dashboard
+~2. Create a prettier dashboard~
 3. Add Data Visualization/Charts on Demand.
 4. Add the feature to create groups.
 5. A specific song over time graph. So that a user can see the number of times the user listened to the song/genre overtime.
@@ -39,3 +39,9 @@ Keeps track of your music history from the moment you register and provide you w
 
 1. API RATE OVERLOADING -> Haven't handled errors reagarding API rate limiting.
 2. No unit tests implemented
+
+## Issues
+
+1. Fix the updateTracks middleware to make the code more efficient.
+2. Restructure the mongo schema to decrease the number of calls required.
+3. Mongodb restricts the number of database, so restructure the code to make sure users share DB.

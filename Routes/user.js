@@ -1,58 +1,69 @@
 const express = require('express')
-const path = require('path');
-
 const router = express.Router()
-
-const { spotify } = require('../Models/spotifyApi.js')
-const { getTopArtists, getTopTracks, getRecentlyPlayed } = require('../Models/user.js');
-
+const { spotify } = require('../Models/spotify.js')
 
 /**
- * Can be considered User "dashboard"
- * This is where the user will land once they login
+ * Fetches user profile
  */
 router.get('/', async (req, res) => {
   try{
-    const access_token = await req.session.secret
+    const access_token = req.token;
     const user = await spotify.getUserProfile(access_token)
-    const user_id = await user.id
-    const name = await user.display_name
-    req.session.name = name;
-    req.session.user_id = user_id;
-    res.render(path.resolve("./Views/User"), {"user_data": {name, user_id}});
+    return res.status(200).json({
+      success: true,
+      message: "Data successfully Fetched",
+      data: user
+    });
   }catch(err){
-      res.redirect(process.env.MAIN_URI);
+    return res.status(401).json({
+      success: false,
+      message: "Failed to fetch data",
+      data: null
+    });
   }
-
 })
 
 /**
  * Get Top Artists of the user based on the term Specified
- * Defaults to long_term
  */
 router.get('/top-artists', async (req, res) => {
   try{
-    const access_token = req.session.secret;
+    const access_token = req.token;
     const term = req.query.term;
-    const artists = await getTopArtists(access_token, term);
-    res.render(path.resolve("./Views/TopList"), {"items": artists});
-  } catch (err){
-    res.redirect('/');
+    const artists = await spotify.getUserTopArtists(access_token, term);
+    return res.status(200).json({
+      success: true,
+      message: "Data successfully Fetched",
+      data: artists
+    });
+  }catch(err){
+    return res.status(401).json({
+      success: false,
+      message: "Failed to fetch data",
+      data: null
+    });
   }
 })
 
 /**
  * Get Top Tracks of the user based on the term Specified
- * Defaults to long_term
  */
 router.get('/top-tracks', async (req, res) => {
   try{
-    const access_token = req.session.secret;
+    const access_token = req.token;
     const term = req.query.term;
-    const tracks = await getTopTracks(access_token, term);
-    res.render(path.resolve("./Views/TopList"), {"items": tracks});
-  } catch (err){
-    res.redirect('/');
+    const tracks = await spotify.getUserTopTracks(access_token, term);
+    return res.status(200).json({
+      success: true,
+      message: "Data successfully Fetched",
+      data: tracks
+    });
+  }catch(err){
+    return res.status(401).json({
+      success: false,
+      message: "Failed to fetch data",
+      data: null
+    });
   }
   })
 
@@ -62,12 +73,19 @@ router.get('/top-tracks', async (req, res) => {
  */
 router.get('/recently-played', async (req, res) => {
   try{
-    const access_token = await req.session.secret
-    const user_id = await req.session.user_id
-    const recent = await getRecentlyPlayed(access_token, user_id);
-    res.send(recent);
-  }  catch (err){
-    res.redirect('/');
+    const access_token = req.token;
+    const recent = await spotify.getUserRecentlyPlayed(access_token);
+    return res.status(200).json({
+      success: true,
+      message: "Data successfully Fetched",
+      data: recent
+    });
+  }catch(err){
+    return res.status(401).json({
+      success: false,
+      message: "Failed to fetch data",
+      data: null
+    });
   }
 })
 

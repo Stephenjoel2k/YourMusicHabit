@@ -3,7 +3,7 @@ const MongoClient = mongodb.MongoClient;
 const moment = require('moment');
 
 
-const { spotify } = require('../Models/spotifyApi.js')
+const { spotify } = require('../Models/spotify.js')
 
 /**
  * 
