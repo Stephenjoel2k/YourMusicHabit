@@ -1,8 +1,8 @@
 # YourMusicHabit
 
-link: https://yourmusichabit.herokuapp.com/
+link: https://yourmusichabit.herokuapp.com/api/
 
-Keeps track of your music history from the moment you register and provide you with interesting insights.
+Api for the app that keeps track of your music history from the moment you register and provide you with interesting insights.
 
 ## Current Status
 
