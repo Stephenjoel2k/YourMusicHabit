@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors');
 require('dotenv').config();
 
 // a cron task
@@ -12,8 +13,10 @@ const {checkToken} = require('./Middleware/token');
 const authRoutes = require('./Routes/auth')
 const userRoutes = require('./Routes/user')
 
+
 //Middleware
 app.use(express.json())
+app.use(cors());
 app.use('/api/database/update', updateUsersTracks)
 app.use('/auth', authRoutes);
 app.use(checkToken);
