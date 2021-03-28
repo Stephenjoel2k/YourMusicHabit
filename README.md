@@ -18,6 +18,7 @@ Api for the app that keeps track of your music history from the moment you regis
 1. How mainstream are you? Analyses user's past 50 songs and favorite artists/tracks based on different terms - to provide them information on their genre/mainstreamness. This will get an hollistic view of how popular the artists they listen to are! And look at the trend of their top artists every term.
 2. Scan QR Code/or through invite link, match the mutual artists/tracks in different timespans and also provide an analysis on similarities. Potentially create a playlist based on 2 tastes.
 3. Send weekly detailed statistics about user's music habits! And use third party API to analyse user's music taste/habits.
+4. Automatically create spotify playlists based on 4 people's music taste
 
 ## POTENTIAL HAZARDS
 
