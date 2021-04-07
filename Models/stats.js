@@ -1,38 +1,66 @@
 //Extracts filters and returns all relevant data from the user's saved DB ids.
-
-
 const {db} = require('./db');
 const {spotify} = require('./spotify');
 const {filter} = require('./filter');
+const {compute} = require('./compute');
 
 /**
  * 
  * @param {*} access_token 
+ * @param {String} type // Days or Weeks
+ * @param {Int} count  // Like 0 for today, 1 for yesterday or 0 for this week or 1 for last week
+ * @param {Int} offset // Like 300 of EST/-5:00 or -330 for IST/+5:30 utc 
+ */
+const getStats = async (access_token, type, count, offset) => {
+    var [start, end] = compute.getDate(type, count, offset);
+    const tracksDB = await db.getTracks(access_token, start, end);        //Get tracks within the defined start, end date from DB
+    const tracksData = await TrackIDtoTrackData(access_token, tracksDB);  //Add all data in tracks and filter out irrelevant key/value pairs
+
+    // Can add more functions here to get more descriptive stats
+    const topArtists = compute.findTopNArtists(tracksData, 10); 
+    const topTracks = compute.findTopNTracks(tracksData, 10);
+    const sessions = compute.findListenSessions(tracksData);
+    const duration = compute.findListenDuration(tracksData);    
+    return {topArtists, topTracks, sessions, duration};
+}
+
+
+
+
+
+
+
+
+/***********************************************************************************************************************************
+ * Functions below help filtering and adding data to tracks using SPOTIFY API
+ */
+
+
+/**
+ * 
+ * @param {*} tracks 
  * @returns 
  */
-const getStats = async (access_token) => {
-    //Change this line to update the time parameters to restrict data from only N number of days
-    const tracks = await db.getTracks(access_token);
+const TrackIDtoTrackData = async (access_token, tracks) => {
+    if(!tracks || tracks.length == 0) return;
+
     const tracksWithFullData = [];
     //Chunking tracks by 50 each time
     for (var i=0,j = tracks.length; i<j; i+=50) {
         const tracks50 = tracks.slice(i, i+50);
-        const tracks50WithMetadata = await spotify.getSeveralTracks(access_token, tracks50);
-        const tracks50WithAudioFeatures = await spotify.getSeveralTracksAudioFeatures(access_token, tracks50);
-        const tracks50WithFullData = await merge(tracks50WithMetadata, tracks50WithAudioFeatures);
+        const trackIds = [];
+        tracks50.forEach(track => { trackIds.push(track.t_id)});
+        const tracks50WithTrackdata = await spotify.getSeveralTracks(access_token, trackIds);
+        const tracks50WithAudioFeatures = await spotify.getSeveralTracksAudioFeatures(access_token, trackIds);
+        const tracks50WithFullData = merge(tracks50WithTrackdata, tracks50WithAudioFeatures);
         tracks50WithFullData.forEach(track => tracksWithFullData.push(track));
     }
-    var tracksAndArtistsWithFullData = await mergeArtistsInfo(access_token, tracksWithFullData);
-    await insertPlayedAt(tracks, tracksAndArtistsWithFullData)
-    const filteredData = await filter.statsTracks(tracksAndArtistsWithFullData);
-    return filteredData;
+    var tracksAndArtistsWithFullData = await addArtistInfo(access_token, tracksWithFullData);  //Add artist info
+    insertPlayedAt(tracks, tracksAndArtistsWithFullData)  //Add played_at timestamps to the data
+    const filteredData = filter.statsTracks(tracksAndArtistsWithFullData);     // remove unecessary key value pairs from the object
+    return filteredData;  //return data;
 }
 
-const insertPlayedAt = (PlayedAt, trackWithFullData) => {
-    for(let i = 0; i < trackWithFullData.length; i++){
-        trackWithFullData[i].played_at = PlayedAt[i].played_at;
-    }
-}
 
 /**
  * Merge audio features and track data
@@ -40,10 +68,8 @@ const insertPlayedAt = (PlayedAt, trackWithFullData) => {
  * @param {*} audio_features 
  * @returns 
  */
-const merge = async (tracks, audio_features) => {
-    if(tracks.length != audio_features.length){
-        return "error";
-    }
+const merge = (tracks, audio_features) => {
+    if(tracks.length != audio_features.length) return;
     var length = tracks.length;
     const mergedData = [];
     for(var i = 0; i < length; i++){
@@ -60,7 +86,9 @@ const merge = async (tracks, audio_features) => {
  * @param {*} data 
  * @returns 
  */
-const mergeArtistsInfo = async (access_token, data) => {
+const addArtistInfo = async (access_token, data) => {
+    if(!data || data.length == 0) return;
+
     const tracks = data;
     let artists_ids = [], merge_info_ids = [];
     let start_pos = 0;
@@ -71,14 +99,14 @@ const mergeArtistsInfo = async (access_token, data) => {
             ids.forEach(id => {artists_ids.push(id)});
             merge_info_ids.push(no_of_ids);
         }else{
-            await fetchAndMerge(artists_ids, merge_info_ids, start_pos, access_token, data);
+            await fetchAndMergeArtists(artists_ids, merge_info_ids, start_pos, access_token, data);
             artists_ids = [];
             start_pos = merge_info_ids.length;
             ids.forEach(id => {artists_ids.push(id)});
             merge_info_ids.push(no_of_ids);
         }
     }
-    await fetchAndMerge(artists_ids, merge_info_ids, start_pos, access_token, data);
+    await fetchAndMergeArtists(artists_ids, merge_info_ids, start_pos, access_token, data);
     return data;
 }
 
@@ -92,7 +120,8 @@ const mergeArtistsInfo = async (access_token, data) => {
  * @param {*} data 
  * @returns 
  */
-const fetchAndMerge = async (artists_ids, merge_info_ids, start_pos, access_token, data) => {
+const fetchAndMergeArtists = async (artists_ids, merge_info_ids, start_pos, access_token, data) => {
+    if(!data || data.length == 0) return;
     const artists_data = await spotify.getSeveralArtists(access_token, artists_ids);
     for(let i = start_pos, j = 0; i < merge_info_ids.length; i++){
         var count = merge_info_ids[i];
@@ -101,6 +130,19 @@ const fetchAndMerge = async (artists_ids, merge_info_ids, start_pos, access_toke
     }
     return;
 }
+
+/**
+ * 
+ * @param {Object} PlayedAt 
+ * @param {Object} trackWithFullData 
+ */
+ const insertPlayedAt = (PlayedAt, trackWithFullData) => {
+    for(let i = 0; i < trackWithFullData.length; i++){
+        trackWithFullData[i].played_at = PlayedAt[i].played_at;
+    }
+}
+
+
 
 
 module.exports = { getStats };

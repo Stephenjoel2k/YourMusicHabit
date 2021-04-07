@@ -100,10 +100,16 @@ router.get('/recently-played', async (req, res) => {
 })
 
 
+/**
+ * Get top Artists/Tracks with all metadata(audio_features, played_ats etc)
+ */
 router.get('/stats', async (req, res) => {
   try{
     const access_token = req.token;
-    const stats = await getStats(access_token);
+    const type = req.query.type;
+    const count = req.query.count;
+    const offset = req.query.offset;
+    const stats = await getStats(access_token, type, count, offset);
     return res.status(200).json({
       success: true,
       message: "Data successfully Fetched",

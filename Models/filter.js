@@ -58,7 +58,8 @@ const statsTracks = (items) => {
             "album" : {
                 "album_type" : item.album.album_type,
                 "id": item.album.id,
-                "name":item.album.release_date,
+                "date":item.album.release_date,
+                "name": item.album.name,
                 "total_tracks": 8,
             },
             "artists": artists,

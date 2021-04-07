@@ -56,7 +56,7 @@ const putTracks = async(access_token, tracks) => {
  * 
  * Currently timezone agnostic
  */
-const getTracks = async(access_token) => {
+const getTracks = async(access_token, start, end) => {
 
     const url = process.env.MONGO_URI;
     const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -72,7 +72,7 @@ const getTracks = async(access_token) => {
         const db = client.db(dbName);
         const col = db.collection(collectionName);
         const tracks = [];
-        await col.find({}).forEach(track => tracks.push(track));
+        await col.find({"played_at": {$gte: start, $lte: end}}).forEach(track => tracks.push(track));
         return tracks;
     } catch (err) {
         console.log(err.stack);
