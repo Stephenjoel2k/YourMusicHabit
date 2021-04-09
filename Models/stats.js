@@ -21,7 +21,7 @@ const getStats = async (access_token, type, count, offset) => {
     const topTracks = compute.findTopNTracks(tracksData, 10);
     const sessions = compute.findListenSessions(tracksData);
     const duration = compute.findListenDuration(tracksData);    
-    return {topArtists, topTracks, sessions, duration};
+    return {topArtists, topTracks, sessions, duration, tracksData};
 }
 
 

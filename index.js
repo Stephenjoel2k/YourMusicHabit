@@ -11,11 +11,13 @@ const {checkToken} = require('./Middleware/token');
 const authRoutes = require('./Routes/auth')
 const userRoutes = require('./Routes/user')
 const cronRoutes = require('./Routes/cron');
+const miscellaneousRoutes = require('./Routes/miscellaneous');
 
 //Middleware
 app.use(express.json())
 app.use(cors());
-app.use('/api/cron', cronRoutes)
+app.use('/api/miscellaneous', miscellaneousRoutes);
+app.use('/api/cron', cronRoutes);
 app.use('/auth', authRoutes);
 app.use(checkToken);
 app.use('/api/user', userRoutes);
