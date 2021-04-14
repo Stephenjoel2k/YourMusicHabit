@@ -17,11 +17,11 @@ const getStats = async (access_token, type, count, offset) => {
     const tracksData = await TrackIDtoTrackData(access_token, tracksDB);  //Add all data in tracks and filter out irrelevant key/value pairs
 
     // Can add more functions here to get more descriptive stats
-    const topArtists = compute.findTopArtists(tracksData); 
-    const topTracks = compute.findTopTracks(tracksData);
+    const topArtists = compute.findTopNArtists(tracksData, 50); 
+    const topTracks = compute.findTopNTracks(tracksData, 50);
     const sessions = compute.findListenSessions(tracksData);
     const duration = compute.findListenDuration(tracksData);    
-    return {topArtists, topTracks, sessions, duration};
+    return {topArtists, topTracks, sessions, duration, tracksData};
 }
 
 
