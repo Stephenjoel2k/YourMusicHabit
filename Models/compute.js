@@ -88,10 +88,9 @@ const findListenSessions = (data) => {
 /**
  * 
  * @param {Object} data //tracks with all metadata
- * @param {Int} N 
  * @returns Top N Artists in array format
  */
-const findTopNArtists = (data, N) => {
+const findTopArtists = (data) => {
     if(!data || data.length == 0) return;
     const artistsMap = {};
     for(let i = 0; i < data.length; i++){
@@ -116,7 +115,7 @@ const findTopNArtists = (data, N) => {
         heap.push(artistsMap[id]);
     })
     const artists = [];
-    while(heap.size() > 0 && N-- > 0){
+    while(heap.size() > 0){
         artists.push(heap.pop());
     }
     return artists;
@@ -126,10 +125,9 @@ const findTopNArtists = (data, N) => {
 /**
  * 
  * @param {Object} data //tracks with all metadata
- * @param {Int} N 
  * @returns Top N Tracks in an Array format
  */
-const findTopNTracks = (data, N) => {
+const findTopTracks = (data) => {
     if(!data || data.length == 0) return;
     const tracksMap = {};
     for(let i = 0; i < data.length; i++){
@@ -154,7 +152,7 @@ const findTopNTracks = (data, N) => {
     })
     
     const tracks = [];
-    while(heap.size() > 0 && N-- > 0){
+    while(heap.size() > 0){
         tracks.push(heap.pop());
     }
     return tracks;
@@ -166,8 +164,8 @@ const compute = {
     getDate,
     findListenDuration,
     findListenSessions,
-    findTopNArtists,
-    findTopNTracks
+    findTopArtists,
+    findTopTracks
 }
 
 module.exports = { compute };
